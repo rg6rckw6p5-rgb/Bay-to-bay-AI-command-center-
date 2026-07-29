@@ -1,0 +1,18 @@
+.login-page { min-height: 100vh; max-width: none; padding: 0; display: grid; grid-template-columns: 1.05fr .95fr; background: #f5f8f6; }
+.login-brand { padding: clamp(40px, 8vw, 120px); display: flex; flex-direction: column; justify-content: center; color: white; background: radial-gradient(circle at 15% 20%, #2c806a, transparent 30%), linear-gradient(140deg, #0b342f, #176b57); }
+.login-brand .eyebrow { color: #a8dcca; }
+.login-brand h1 { font: 600 clamp(42px, 5.4vw, 78px)/1.03 Georgia, serif; margin: 24px 0; }
+.login-brand h1 em { color: #e6b65d; font-style: normal; }
+.login-brand > p:last-child { max-width: 560px; color: #c6dfd7; line-height: 1.6; }
+.login-panel { padding: 32px; display: grid; place-items: center; }
+.login-panel form { width: min(430px, 100%); background: white; border: 1px solid #dfe8e5; border-radius: 22px; padding: clamp(28px, 5vw, 48px); box-shadow: 0 22px 60px #173f3514; }
+.login-panel h2 { font: 600 34px Georgia, serif; margin: 10px 0 8px; }
+.login-intro { color: #647676; margin-bottom: 30px; }
+.login-panel label { display: grid; gap: 8px; margin: 18px 0; font-size: 13px; font-weight: 700; }
+.login-panel input { width: 100%; padding: 13px 14px; border: 1px solid #cfdcd8; border-radius: 10px; font: inherit; outline: none; }
+.login-panel input:focus { border-color: #176b57; box-shadow: 0 0 0 3px #dff3e9; }
+.login-panel button { width: 100%; border: 0; padding: 14px; margin: 8px 0 18px; border-radius: 11px; color: white; background: #176b57; font-weight: 800; }
+.login-panel button:disabled { opacity: .65; cursor: wait; }
+.login-panel small { display: block; text-align: center; color: #647676; }
+.login-error { padding: 11px 12px; color: #8d3027; background: #feeae7; border-radius: 9px; font-size: 13px; }
+@media (max-width: 800px) { .login-page { grid-template-columns: 1fr; } .login-brand { min-height: 42vh; padding: 40px 24px; } .login-panel { padding: 22px 16px; } }
