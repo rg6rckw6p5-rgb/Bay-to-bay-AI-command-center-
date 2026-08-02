@@ -20,11 +20,14 @@ h1 { font: 600 24px Georgia, serif; margin-top: 5px; }
 h2 { font: 600 30px/1.15 Georgia, serif; }
 .eyebrow { color: var(--green); font-size: 11px; font-weight: 800; letter-spacing: .16em; }
 .status { display: flex; gap: 9px; align-items: center; font-size: 13px; color: var(--muted); }
+.account-actions { display: flex; align-items: center; gap: 14px; color: var(--muted); }
+.account-actions form { margin: 0; }
 .status span { width: 9px; height: 9px; border-radius: 50%; background: #2ab673; box-shadow: 0 0 0 4px #def5ea; }
 .hero { margin-top: 28px; min-height: 220px; padding: 42px; color: white; border-radius: 24px; display: flex; justify-content: space-between; align-items: end; background: radial-gradient(circle at 80% 20%, #2b8069, transparent 35%), linear-gradient(135deg, #0c3d36, #176b57); box-shadow: 0 16px 36px #143f3720; }
 .hero h2 { font-size: 42px; max-width: 710px; margin: 12px 0; }
 .hero p:not(.eyebrow) { max-width: 720px; color: #d9ebe5; line-height: 1.5; }
 .hero button { border: 0; border-radius: 12px; padding: 15px 19px; background: white; color: var(--green); font-weight: 800; white-space: nowrap; }
+.hero-action { border-radius: 12px; padding: 15px 19px; background: white; color: var(--green); font-weight: 800; white-space: nowrap; text-decoration: none; }
 .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin: 18px 0 40px; }
 .metrics article { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 22px; display: grid; gap: 5px; }
 .metrics strong { font: 600 32px Georgia, serif; }
@@ -44,6 +47,7 @@ h2 { font: 600 30px/1.15 Georgia, serif; }
 .split { display: grid; grid-template-columns: 1.35fr .65fr; gap: 14px; }
 .panel { background: white; border: 1px solid var(--line); border-radius: 19px; padding: 24px; }
 .badge { color: #a54337; background: #feeae7; padding: 6px 9px; border-radius: 999px; font-size: 11px; font-weight: 700; }
+.badge.ready, .connected-label { color: var(--green); background: var(--mint); padding: 6px 9px; border-radius: 999px; font-size: 11px; font-weight: 700; }
 .queue { display: grid; grid-template-columns: 10px 1fr auto; gap: 12px; align-items: center; padding: 15px 0; border-top: 1px solid var(--line); }
 .pulse { width: 8px; height: 8px; background: var(--gold); border-radius: 50%; }
 .queue strong, .queue small { display: block; font-size: 13px; }
@@ -54,12 +58,16 @@ h2 { font: 600 30px/1.15 Georgia, serif; }
 .assistant > p:not(.eyebrow) { color: #b9cdca; line-height: 1.5; font-size: 14px; }
 .prompt { display: flex; justify-content: space-between; align-items: center; background: white; color: #62716f; border-radius: 12px; padding: 8px 8px 8px 14px; margin: 28px 0 12px; font-size: 13px; }
 .prompt button { border: 0; width: 34px; height: 34px; border-radius: 9px; background: var(--gold); color: white; font-weight: 800; }
+.disabled-prompt { color: #72817f; justify-content: center; }
 
 @media (max-width: 800px) {
   main { padding: 0 16px 40px; }
   .hero { padding: 28px; display: block; }
   .hero h2 { font-size: 34px; }
   .hero button { margin-top: 26px; width: 100%; }
+  .hero-action { display: block; margin-top: 26px; text-align: center; }
+  .account-actions { align-items: flex-end; flex-direction: column; gap: 5px; }
+  .account-actions .status { display: none; }
   .metrics { grid-template-columns: repeat(2, 1fr); }
   .org-grid, .split { grid-template-columns: 1fr; }
 }

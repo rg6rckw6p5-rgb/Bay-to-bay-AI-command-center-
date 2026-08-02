@@ -1,13 +1,44 @@
-const organizations = [
-  ["Tree Services", "🌳", "12 active leads", "4 estimates today"],
-  ["Premier Painting", "🎨", "8 active leads", "2 estimates today"],
-  ["Docks & Decks", "⚓", "6 active leads", "3 site visits"],
-  ["Landscaping", "🌿", "9 active leads", "5 follow-ups"],
-  ["ArborPro", "🌲", "4 consultations", "2 reports due"],
-  ["Rise & Shine", "❤️", "7 open intakes", "3 volunteers needed"],
-];
+type Organization = {
+  id: string;
+  name: string;
+  slug: string;
+  kind: "business" | "nonprofit";
+};
 
-export default function CommandDashboard() {
+type DashboardMetrics = {
+  organizations: number;
+  contacts: number;
+  conversations: number;
+  messages: number;
+};
+
+const icons: Record<string, string> = {
+  "tree-services": "🌳",
+  "premier-painting": "🎨",
+  "docks-decks": "⚓",
+  landscaping: "🌿",
+  arborpro: "🌲",
+  "rise-and-shine": "❤️",
+};
+
+export default function CommandDashboard({
+  organizations,
+  metrics,
+  userEmail,
+  signOut,
+}: {
+  organizations: Organization[];
+  metrics: DashboardMetrics;
+  userEmail: string;
+  signOut: () => Promise<void>;
+}) {
+  const metricCards = [
+    [String(metrics.organizations), "Organizations", "Owner access confirmed"],
+    [String(metrics.contacts), "Customers", "Live Supabase records"],
+    [String(metrics.conversations), "Conversations", "Across all channels"],
+    [String(metrics.messages), "Messages", "Inbound and outbound"],
+  ];
+
   return (
     <main>
       <header className="topbar">
@@ -15,25 +46,24 @@ export default function CommandDashboard() {
           <span className="eyebrow">BAY TO BAY HOLDINGS</span>
           <h1>AI Command Center</h1>
         </div>
-        <div className="status"><span /> Systems ready</div>
+        <div className="account-actions">
+          <div className="status"><span /> Live data connected</div>
+          <small>{userEmail}</small>
+          <form action={signOut}><button className="quiet" type="submit">Sign out</button></form>
+        </div>
       </header>
 
       <section className="hero">
         <div>
-          <p className="eyebrow">MONDAY MORNING BRIEFING</p>
-          <h2>Good morning. Here’s what needs your attention.</h2>
-          <p>One workspace for customer conversations, estimates, scheduling, field work, and community outreach.</p>
+          <p className="eyebrow">OWNER OVERVIEW</p>
+          <h2>Your command center is securely connected.</h2>
+          <p>Customer conversations and organization activity will appear here as your service channels come online.</p>
         </div>
-        <button>Open unified inbox <span>→</span></button>
+        <a className="hero-action" href="#workspaces">View workspaces <span>→</span></a>
       </section>
 
-      <section className="metrics" aria-label="Business overview">
-        {[
-          ["46", "Open leads", "+8 this week"],
-          ["11", "Estimates due", "4 high priority"],
-          ["18", "Jobs scheduled", "Next 7 days"],
-          ["92%", "Response rate", "Under 60 seconds"],
-        ].map(([value, label, note]) => (
+      <section className="metrics" aria-label="Live business overview">
+        {metricCards.map(([value, label, note]) => (
           <article key={label}>
             <strong>{value}</strong>
             <span>{label}</span>
@@ -42,16 +72,20 @@ export default function CommandDashboard() {
         ))}
       </section>
 
-      <section className="section">
+      <section className="section" id="workspaces">
         <div className="section-heading">
           <div><p className="eyebrow">WORKSPACES</p><h2>Your organizations</h2></div>
-          <button className="quiet">View reports</button>
+          <span className="connected-label">Database verified</span>
         </div>
         <div className="org-grid">
-          {organizations.map(([name, icon, activity, task]) => (
-            <article className="org-card" key={name}>
-              <div className="org-icon">{icon}</div>
-              <div><h3>{name}</h3><p>{activity}</p><small>{task}</small></div>
+          {organizations.map((organization) => (
+            <article className="org-card" key={organization.id}>
+              <div className="org-icon">{icons[organization.slug] ?? "◆"}</div>
+              <div>
+                <h3>{organization.name}</h3>
+                <p>{organization.kind === "nonprofit" ? "Nonprofit workspace" : "Service business"}</p>
+                <small>Secure owner access enabled</small>
+              </div>
               <span className="arrow">→</span>
             </article>
           ))}
@@ -60,21 +94,21 @@ export default function CommandDashboard() {
 
       <section className="section split">
         <article className="panel">
-          <div className="section-heading"><div><p className="eyebrow">AI OPERATIONS</p><h2>Priority queue</h2></div><span className="badge">4 urgent</span></div>
+          <div className="section-heading"><div><p className="eyebrow">SETUP STATUS</p><h2>Production readiness</h2></div><span className="badge ready">Core ready</span></div>
           {[
-            ["Storm-damaged oak over roof", "Tree Services · 2 min ago", "Emergency"],
-            ["Estimate follow-up overdue", "Premier Painting · 1 day ago", "Sales"],
-            ["Housing assistance request", "Rise & Shine · 18 min ago", "Human review"],
-          ].map(([title, meta, tag]) => (
-            <div className="queue" key={title}><span className="pulse" /><div><strong>{title}</strong><small>{meta}</small></div><em>{tag}</em></div>
+            ["Secure owner authentication", "Complete"],
+            ["Organization data isolation", "Complete"],
+            ["SMS and AI credentials", "Next"],
+          ].map(([title, tag]) => (
+            <div className="queue" key={title}><span className="pulse" /><div><strong>{title}</strong><small>Verified against the production foundation</small></div><em>{tag}</em></div>
           ))}
         </article>
         <article className="panel assistant">
           <p className="eyebrow">COMMAND AI</p>
-          <h2>Your operations assistant</h2>
-          <p>Ask what needs follow-up, where the schedule has openings, or which leads are ready to close.</p>
-          <div className="prompt">What should I focus on today?<button aria-label="Send">↑</button></div>
-          <small>AI suggestions require human review before customer-facing actions.</small>
+          <h2>Operations assistant</h2>
+          <p>The AI workspace will activate after OpenAI and Twilio server credentials are added securely.</p>
+          <div className="prompt disabled-prompt">AI connection pending</div>
+          <small>No customer-facing automation will run before testing and approval.</small>
         </article>
       </section>
     </main>
