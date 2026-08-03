@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createSupabaseBrowser } from "@/lib/supabase/client";
 import "./login.css";
@@ -54,6 +55,7 @@ export default function LoginForm() {
           <p className="login-intro">Sign in with your company account.</p>
           <label>Email address<input name="email" type="email" autoComplete="email" required /></label>
           <label>Password<input name="password" type="password" autoComplete="current-password" required minLength={8} /></label>
+          <Link className="login-help-link" href="/forgot-password">Forgot your password?</Link>
           {error ? <p className="login-error" role="alert">{error}</p> : null}
           <button type="submit" disabled={loading}>{loading ? "Signing in…" : "Sign in securely"}</button>
           <small>Customer information is protected and access is audited.</small>

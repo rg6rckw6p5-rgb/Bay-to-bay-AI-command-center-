@@ -13,6 +13,8 @@
 .login-panel input:focus { border-color: #176b57; box-shadow: 0 0 0 3px #dff3e9; }
 .login-panel button { width: 100%; border: 0; padding: 14px; margin: 8px 0 18px; border-radius: 11px; color: white; background: #176b57; font-weight: 800; }
 .login-panel button:disabled { opacity: .65; cursor: wait; }
+.login-help-link { display: block; margin: -8px 0 18px; color: #176b57; font-size: 13px; font-weight: 700; text-align: right; }
 .login-panel small { display: block; text-align: center; color: #647676; }
 .login-error { padding: 11px 12px; color: #8d3027; background: #feeae7; border-radius: 9px; font-size: 13px; }
+.login-success { padding: 11px 12px; color: #14513f; background: #e3f5ed; border-radius: 9px; font-size: 13px; }
 @media (max-width: 800px) { .login-page { grid-template-columns: 1fr; } .login-brand { min-height: 42vh; padding: 40px 24px; } .login-panel { padding: 22px 16px; } }
