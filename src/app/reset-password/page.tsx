@@ -13,10 +13,41 @@ export default function ResetPasswordPage() {
 
   useEffect(() => {
     const supabase = createSupabaseBrowser();
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) setReady(true);
-      else setError("This recovery link is invalid or has expired. Request a new one from the sign-in page.");
-    });
+    let active = true;
+
+    async function prepareRecoverySession() {
+      const code = new URLSearchParams(window.location.search).get("code");
+
+      if (code) {
+        const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+
+        if (exchangeError) {
+          if (active) {
+            setError("This recovery link is invalid or has expired. Request a new one from the sign-in page.");
+          }
+          return;
+        }
+
+        window.history.replaceState({}, "", "/reset-password");
+      }
+
+      const { data, error: sessionError } = await supabase.auth.getSession();
+
+      if (!active) return;
+      if (sessionError || !data.session) {
+        setError("This recovery link is invalid or has expired. Request a new one from the sign-in page.");
+        return;
+      }
+
+      setReady(true);
+      setError("");
+    }
+
+    void prepareRecoverySession();
+
+    return () => {
+      active = false;
+    };
   }, []);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
