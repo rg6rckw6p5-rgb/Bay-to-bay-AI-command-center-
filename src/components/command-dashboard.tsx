@@ -12,6 +12,16 @@ type DashboardMetrics = {
   messages: number;
 };
 
+type RecentConversation = {
+  id: string;
+  organizationName: string;
+  contactName: string;
+  mode: "ai" | "human" | "paused";
+  lastMessageAt: string;
+  latestMessage: string;
+  direction: "inbound" | "outbound";
+};
+
 const icons: Record<string, string> = {
   "tree-services": "🌳",
   "premier-painting": "🎨",
@@ -24,11 +34,13 @@ const icons: Record<string, string> = {
 export default function CommandDashboard({
   organizations,
   metrics,
+  recentConversations,
   userEmail,
   signOut,
 }: {
   organizations: Organization[];
   metrics: DashboardMetrics;
+  recentConversations: RecentConversation[];
   userEmail: string;
   signOut: () => Promise<void>;
 }) {
@@ -89,6 +101,37 @@ export default function CommandDashboard({
               <span className="arrow">→</span>
             </article>
           ))}
+        </div>
+      </section>
+
+      <section className="section" id="inbox">
+        <div className="section-heading">
+          <div><p className="eyebrow">UNIFIED INBOX</p><h2>Recent conversations</h2></div>
+          <span className="connected-label">Live SMS data</span>
+        </div>
+        <div className="inbox-panel">
+          {recentConversations.length ? recentConversations.map((conversation) => (
+            <article className="conversation-row" key={conversation.id}>
+              <div className="conversation-avatar">{conversation.contactName.slice(0, 1).toUpperCase()}</div>
+              <div className="conversation-copy">
+                <div className="conversation-title">
+                  <strong>{conversation.contactName}</strong>
+                  <span>{conversation.organizationName}</span>
+                </div>
+                <p><b>{conversation.direction === "inbound" ? "Customer:" : "Reply:"}</b> {conversation.latestMessage}</p>
+              </div>
+              <div className="conversation-meta">
+                <span className={`mode-badge ${conversation.mode}`}>{conversation.mode === "ai" ? "AI active" : conversation.mode === "human" ? "Human takeover" : "Paused"}</span>
+                <time dateTime={conversation.lastMessageAt}>{new Date(conversation.lastMessageAt).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}</time>
+              </div>
+            </article>
+          )) : (
+            <div className="empty-inbox">
+              <span>✦</span>
+              <h3>Your unified inbox is ready.</h3>
+              <p>New customer texts will appear here after the first Twilio number is connected.</p>
+            </div>
+          )}
         </div>
       </section>
 
