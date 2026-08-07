@@ -111,7 +111,7 @@ export default function CommandDashboard({
         </div>
         <div className="inbox-panel">
           {recentConversations.length ? recentConversations.map((conversation) => (
-            <article className="conversation-row" key={conversation.id}>
+            <a className="conversation-row" href={`/dashboard/conversations/${conversation.id}`} key={conversation.id}>
               <div className="conversation-avatar">{conversation.contactName.slice(0, 1).toUpperCase()}</div>
               <div className="conversation-copy">
                 <div className="conversation-title">
@@ -124,7 +124,8 @@ export default function CommandDashboard({
                 <span className={`mode-badge ${conversation.mode}`}>{conversation.mode === "ai" ? "AI active" : conversation.mode === "human" ? "Human takeover" : "Paused"}</span>
                 <time dateTime={conversation.lastMessageAt}>{new Date(conversation.lastMessageAt).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}</time>
               </div>
-            </article>
+              <span className="conversation-open" aria-hidden="true">→</span>
+            </a>
           )) : (
             <div className="empty-inbox">
               <span>✦</span>
