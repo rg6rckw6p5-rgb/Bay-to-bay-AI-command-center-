@@ -1,13 +1,23 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import twilio from "twilio";
+import { getServerEnv } from "@/lib/env";
+import { createSupabaseAdmin } from "@/lib/supabase-admin";
 import { createSupabaseServer } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
 const allowedModes = new Set(["ai", "human", "paused"]);
 
-export default async function ConversationPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function ConversationPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ sent?: string; error?: string }>;
+}) {
   const { id } = await params;
+  const notice = await searchParams;
   const supabase = await createSupabaseServer();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
@@ -63,6 +73,86 @@ export default async function ConversationPage({ params }: { params: Promise<{ i
     revalidatePath("/dashboard");
   }
 
+  async function sendReply(formData: FormData) {
+    "use server";
+    const body = String(formData.get("body") ?? "").trim();
+    if (!body || body.length > 1600) {
+      redirect(`/dashboard/conversations/${id}?error=invalid-message`);
+    }
+
+    const serverSupabase = await createSupabaseServer();
+    const { data: { user: sendingUser } } = await serverSupabase.auth.getUser();
+    if (!sendingUser) redirect("/login");
+
+    const { data: authorizedConversation } = await serverSupabase
+      .from("conversations")
+      .select("id,organization_id,contact_id")
+      .eq("id", id)
+      .maybeSingle();
+    if (!authorizedConversation) redirect("/dashboard");
+
+    const admin = createSupabaseAdmin();
+    const [{ data: sendingOrganization }, { data: sendingContact }] = await Promise.all([
+      admin.from("organizations").select("name,sms_number").eq("id", authorizedConversation.organization_id).single(),
+      admin.from("contacts").select("phone").eq("id", authorizedConversation.contact_id).single(),
+    ]);
+
+    if (!sendingOrganization?.sms_number || !sendingContact?.phone) {
+      redirect(`/dashboard/conversations/${id}?error=number-not-connected`);
+    }
+
+    const { data: consent } = await admin
+      .from("sms_consents")
+      .select("status")
+      .eq("phone", sendingContact.phone)
+      .maybeSingle();
+    if (consent?.status === "opted_out") {
+      redirect(`/dashboard/conversations/${id}?error=opted-out`);
+    }
+
+    try {
+      const env = getServerEnv();
+      const client = twilio(env.TWILIO_ACCOUNT_SID, env.TWILIO_AUTH_TOKEN);
+      const sent = await client.messages.create({
+        body,
+        from: sendingOrganization.sms_number,
+        to: sendingContact.phone,
+        statusCallback: `${env.NEXT_PUBLIC_APP_URL}/api/webhooks/twilio/status`,
+      });
+
+      await Promise.all([
+        admin.from("messages").insert({
+          organization_id: authorizedConversation.organization_id,
+          conversation_id: id,
+          direction: "outbound",
+          body,
+          provider_message_id: sent.sid,
+          status: sent.status || "queued",
+          ai_generated: false,
+        }),
+        admin.from("conversations").update({
+          mode: "human",
+          assigned_user_id: sendingUser.id,
+          last_message_at: new Date().toISOString(),
+        }).eq("id", id),
+        admin.from("audit_logs").insert({
+          organization_id: authorizedConversation.organization_id,
+          actor_user_id: sendingUser.id,
+          action: "manual_sms_sent",
+          entity_type: "conversation",
+          entity_id: id,
+          metadata: { message_sid: sent.sid },
+        }),
+      ]);
+    } catch {
+      redirect(`/dashboard/conversations/${id}?error=send-failed`);
+    }
+
+    revalidatePath(`/dashboard/conversations/${id}`);
+    revalidatePath("/dashboard");
+    redirect(`/dashboard/conversations/${id}?sent=1`);
+  }
+
   return (
     <main className="conversation-page">
       <header className="conversation-header">
@@ -92,6 +182,24 @@ export default async function ConversationPage({ params }: { params: Promise<{ i
         )) : (
           <div className="empty-thread">No messages have been recorded in this conversation yet.</div>
         )}
+      </section>
+
+      <section className="reply-panel" aria-label="Send a text message">
+        <div>
+          <p className="eyebrow">HUMAN REPLY</p>
+          <h2>Text {contactName}</h2>
+          <p>Sending a reply automatically places this conversation in human takeover mode.</p>
+        </div>
+        {notice.sent ? <p className="reply-notice success">Message sent successfully.</p> : null}
+        {notice.error === "invalid-message" ? <p className="reply-notice error">Enter a message of 1–1,600 characters.</p> : null}
+        {notice.error === "number-not-connected" ? <p className="reply-notice error">This company’s Twilio number is not connected yet.</p> : null}
+        {notice.error === "opted-out" ? <p className="reply-notice error">This customer opted out and cannot be texted.</p> : null}
+        {notice.error === "send-failed" ? <p className="reply-notice error">The message could not be sent. Check the Twilio connection and try again.</p> : null}
+        <form className="reply-form" action={sendReply}>
+          <label htmlFor="reply-body">Message</label>
+          <textarea id="reply-body" name="body" maxLength={1600} required placeholder="Type your reply…" />
+          <button type="submit">Send text</button>
+        </form>
       </section>
     </main>
   );

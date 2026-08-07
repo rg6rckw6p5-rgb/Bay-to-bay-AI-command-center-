@@ -98,6 +98,17 @@ h2 { font: 600 30px/1.15 Georgia, serif; }
 .message-bubble p { line-height: 1.5; }
 .message-bubble small { display: block; margin-top: 9px; text-transform: capitalize; }
 .empty-thread { padding: 50px 20px; text-align: center; color: var(--muted); }
+.reply-panel { display: grid; gap: 18px; padding: 24px; border: 1px solid var(--line); border-radius: 19px; background: white; }
+.reply-panel h2 { margin: 5px 0 8px; font-size: 24px; }
+.reply-panel > div > p:last-child { color: var(--muted); font-size: 13px; }
+.reply-form { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: end; }
+.reply-form label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.reply-form textarea { min-height: 92px; resize: vertical; padding: 14px; border: 1px solid var(--line); border-radius: 12px; color: var(--ink); font: inherit; }
+.reply-form textarea:focus { outline: 2px solid #7ec4ad; border-color: var(--green); }
+.reply-form button { min-height: 48px; padding: 0 20px; border: 0; border-radius: 12px; background: var(--green); color: white; font-weight: 800; }
+.reply-notice { padding: 11px 13px; border-radius: 10px; font-size: 13px; font-weight: 700; }
+.reply-notice.success { color: var(--green); background: var(--mint); }
+.reply-notice.error { color: #8f352d; background: #feeae7; }
 
 @media (max-width: 800px) {
   main { padding: 0 16px 40px; }
@@ -117,4 +128,6 @@ h2 { font: 600 30px/1.15 Georgia, serif; }
   .conversation-header { align-items: stretch; flex-direction: column; }
   .mode-controls { display: grid; grid-template-columns: 1fr; }
   .message-bubble { max-width: 90%; }
+  .reply-form { grid-template-columns: 1fr; }
+  .reply-form button { width: 100%; }
 }
