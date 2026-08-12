@@ -91,7 +91,7 @@ export default function CommandDashboard({
         </div>
         <div className="org-grid">
           {organizations.map((organization) => (
-            <article className="org-card" key={organization.id}>
+            <a className="org-card" href={`/dashboard/organizations/${organization.slug}`} key={organization.id}>
               <div className="org-icon">{icons[organization.slug] ?? "◆"}</div>
               <div>
                 <h3>{organization.name}</h3>
@@ -99,7 +99,7 @@ export default function CommandDashboard({
                 <small>Secure owner access enabled</small>
               </div>
               <span className="arrow">→</span>
-            </article>
+            </a>
           ))}
         </div>
       </section>
