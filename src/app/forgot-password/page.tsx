@@ -26,14 +26,27 @@ export default function ForgotPasswordPage() {
       });
 
       if (recoveryError) {
-        setError(recoveryError.message.includes("rate limit")
-          ? "Too many recovery emails were requested. Please wait one hour and try again."
-          : "We could not send the recovery email. Please try again shortly.");
+        const normalizedMessage = recoveryError.message.toLowerCase();
+
+        console.error("Password recovery failed", {
+          code: recoveryError.code ?? "unknown",
+          message: recoveryError.message,
+          status: recoveryError.status,
+        });
+
+        if (normalizedMessage.includes("rate limit")) {
+          setError("Too many recovery emails were requested. Please wait one hour and try again.");
+        } else if (normalizedMessage.includes("smtp") || normalizedMessage.includes("email")) {
+          setError(`The email provider rejected this request. Reference: ${recoveryError.code ?? recoveryError.status ?? "SMTP"}.`);
+        } else {
+          setError(`Password recovery failed. Reference: ${recoveryError.code ?? recoveryError.status ?? "AUTH"}.`);
+        }
         return;
       }
 
       setMessage("Check your email for a secure password-reset link.");
-    } catch {
+    } catch (recoveryException) {
+      console.error("Password recovery request failed", recoveryException);
       setError("Password recovery is temporarily unavailable.");
     } finally {
       setLoading(false);
