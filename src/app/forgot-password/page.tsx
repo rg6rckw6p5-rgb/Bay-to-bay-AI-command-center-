@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { FormEvent, useState } from "react";
-import { createSupabaseBrowser } from "@/lib/supabase/client";
 import "../login/login.css";
 
 export default function ForgotPasswordPage() {
@@ -20,27 +19,15 @@ export default function ForgotPasswordPage() {
     const email = String(form.get("email") ?? "").trim();
 
     try {
-      const supabase = createSupabaseBrowser();
-      const { error: recoveryError } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/reset-password`,
+      const response = await fetch("/api/auth/recovery", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
       });
+      const result = await response.json() as { error?: string; reference?: string };
 
-      if (recoveryError) {
-        const normalizedMessage = recoveryError.message.toLowerCase();
-
-        console.error("Password recovery failed", {
-          code: recoveryError.code ?? "unknown",
-          message: recoveryError.message,
-          status: recoveryError.status,
-        });
-
-        if (normalizedMessage.includes("rate limit")) {
-          setError("Too many recovery emails were requested. Please wait one hour and try again.");
-        } else if (normalizedMessage.includes("smtp") || normalizedMessage.includes("email")) {
-          setError(`The email provider rejected this request. Reference: ${recoveryError.code ?? recoveryError.status ?? "SMTP"}.`);
-        } else {
-          setError(`Password recovery failed. Reference: ${recoveryError.code ?? recoveryError.status ?? "AUTH"}.`);
-        }
+      if (!response.ok) {
+        setError(`${result.error ?? "Password recovery is temporarily unavailable."} Reference: ${result.reference ?? response.status}.`);
         return;
       }
 
