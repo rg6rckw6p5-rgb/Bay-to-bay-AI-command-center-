@@ -116,6 +116,22 @@ h2 { font: 600 30px/1.15 Georgia, serif; }
 .workspace-conversation strong, .workspace-conversation small { display: block; }
 .workspace-conversation small { margin-top: 5px; color: var(--muted); font-size: 11px; }
 .compact { padding: 30px 12px; }
+.action-link { text-decoration: none; }
+.bot-notice { margin-top: 22px; }
+.bot-layout { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(280px, .6fr); gap: 16px; }
+.bot-form { display: grid; gap: 16px; }
+.bot-form h2, .bot-summary h2 { margin: 5px 0 8px; }
+.field-help, .guardrails p { color: var(--muted); font-size: 13px; line-height: 1.5; }
+.bot-form > label:not(.toggle-row) { font-size: 13px; font-weight: 800; }
+.bot-form textarea { min-height: 300px; resize: vertical; padding: 16px; border: 1px solid var(--line); border-radius: 13px; color: var(--ink); font: 14px/1.55 Arial, sans-serif; }
+.bot-form textarea:focus { outline: 2px solid #7ec4ad; border-color: var(--green); }
+.bot-form > button { justify-self: start; border: 0; border-radius: 12px; padding: 14px 18px; background: var(--green); color: white; font-weight: 800; }
+.toggle-row { display: flex; gap: 12px; align-items: flex-start; padding: 15px; border: 1px solid var(--line); border-radius: 12px; }
+.toggle-row input { width: 18px; height: 18px; accent-color: var(--green); }
+.toggle-row strong, .toggle-row small { display: block; }
+.toggle-row small { margin-top: 5px; color: var(--muted); }
+.guardrails { margin-top: 22px; padding: 16px; border-radius: 13px; background: var(--mint); }
+.guardrails p { margin-top: 8px; color: var(--green); }
 
 @media (max-width: 800px) {
   main { padding: 0 16px 40px; }
@@ -137,4 +153,5 @@ h2 { font: 600 30px/1.15 Georgia, serif; }
   .message-bubble { max-width: 90%; }
   .reply-form { grid-template-columns: 1fr; }
   .reply-form button { width: 100%; }
+  .bot-layout { grid-template-columns: 1fr; }
 }
