@@ -58,7 +58,7 @@ export default async function OrganizationWorkspace({ params }: { params: Promis
           }) : <div className="empty-inbox compact"><h3>No conversations yet</h3><p>Incoming texts for this organization will appear here.</p></div>}
         </article>
         <article className="panel">
-          <div className="section-heading"><div><p className="eyebrow">BOT READINESS</p><h2>Communication channel</h2></div></div>
+          <div className="section-heading"><div><p className="eyebrow">BOT READINESS</p><h2>Communication channel</h2></div><Link className="quiet action-link" href={`/dashboard/organizations/${organization.slug}/bot`}>Configure bot</Link></div>
           <div className="queue"><span className="pulse" /><div><strong>Organization identity</strong><small>Separate workspace and AI context</small></div><em>Ready</em></div>
           <div className="queue"><span className="pulse" /><div><strong>SMS routing</strong><small>{organization.sms_number ?? "Waiting for an approved Twilio number"}</small></div><em>{organization.sms_number ? "Ready" : "Pending"}</em></div>
           <div className="queue"><span className="pulse" /><div><strong>Human takeover</strong><small>Owner can pause AI and reply directly</small></div><em>Ready</em></div>
