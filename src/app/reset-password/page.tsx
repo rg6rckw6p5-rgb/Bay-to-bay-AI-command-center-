@@ -16,7 +16,12 @@ export default function ResetPasswordPage() {
     let active = true;
 
     async function prepareRecoverySession() {
-      const code = new URLSearchParams(window.location.search).get("code");
+      const query = new URLSearchParams(window.location.search);
+      const hash = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+      const code = query.get("code");
+      const tokenHash = query.get("token_hash");
+      const accessToken = hash.get("access_token");
+      const refreshToken = hash.get("refresh_token");
 
       if (code) {
         const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
@@ -28,6 +33,33 @@ export default function ResetPasswordPage() {
           return;
         }
 
+      } else if (tokenHash) {
+        const { error: verifyError } = await supabase.auth.verifyOtp({
+          token_hash: tokenHash,
+          type: "recovery",
+        });
+
+        if (verifyError) {
+          if (active) {
+            setError("This recovery link is invalid or has expired. Request a new one from the sign-in page.");
+          }
+          return;
+        }
+      } else if (accessToken && refreshToken) {
+        const { error: sessionSetupError } = await supabase.auth.setSession({
+          access_token: accessToken,
+          refresh_token: refreshToken,
+        });
+
+        if (sessionSetupError) {
+          if (active) {
+            setError("This recovery link is invalid or has expired. Request a new one from the sign-in page.");
+          }
+          return;
+        }
+      }
+
+      if (code || tokenHash || accessToken) {
         window.history.replaceState({}, "", "/reset-password");
       }
 
