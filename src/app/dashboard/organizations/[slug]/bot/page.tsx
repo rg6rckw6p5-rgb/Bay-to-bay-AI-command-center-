@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createSupabaseServer } from "@/lib/supabase/server";
+import { BotTestConsole } from "./bot-test-console";
 
 export const dynamic = "force-dynamic";
 
@@ -87,6 +88,8 @@ export default async function BotConfigurationPage({
           <div className="guardrails"><strong>Built-in safety rules</strong><p>Consent enforcement, STOP handling, emergency escalation, human takeover, message history, and organization isolation remain active regardless of custom instructions.</p></div>
         </aside>
       </section>
+
+      <BotTestConsole slug={slug} active={organization.active} />
     </main>
   );
 }
