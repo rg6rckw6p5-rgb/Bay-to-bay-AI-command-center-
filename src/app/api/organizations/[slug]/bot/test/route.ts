@@ -4,6 +4,7 @@ import {
   emergencyReply,
   generateAssistantReply,
   requiresHumanEscalation,
+  toAIServiceError,
 } from "@/lib/ai-assistant";
 import { createSupabaseServer } from "@/lib/supabase/server";
 
@@ -56,9 +57,17 @@ export async function POST(
       history,
     });
     return NextResponse.json({ reply, escalated: false });
-  } catch {
+  } catch (error) {
+    const aiError = toAIServiceError(error);
+    console.error("Private AI test failed", {
+      code: aiError.code,
+      status: aiError.status,
+      requestId: aiError.requestId,
+    });
+
     return NextResponse.json({
-      error: "The AI service could not answer. Check the OpenAI account and try again.",
-    }, { status: 502 });
+      error: aiError.message,
+      code: aiError.code,
+    }, { status: aiError.status });
   }
 }
